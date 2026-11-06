@@ -1,0 +1,71 @@
+{
+  "id": "DEMO-023",
+  "title": "Driver attention safeguard update",
+  "version": "demo-2.0",
+  "submitter": "engineer",
+  "configurations": [
+    "Hardware A",
+    "Hardware B"
+  ],
+  "scenarios": [
+    "Attention lapse",
+    "Mode transition",
+    "Operating boundary"
+  ],
+  "evidence": [
+    {
+      "configuration": "Hardware A",
+      "scenario": "Attention lapse",
+      "version": "demo-2.0",
+      "trials": 40,
+      "successes": 39,
+      "source": "SYNTHETIC-LAB-1",
+      "revision": "r1"
+    },
+    {
+      "configuration": "Hardware A",
+      "scenario": "Mode transition",
+      "version": "demo-2.0",
+      "trials": 40,
+      "successes": 39,
+      "source": "SYNTHETIC-LAB-2",
+      "revision": "r1"
+    },
+    {
+      "configuration": "Hardware A",
+      "scenario": "Operating boundary",
+      "version": "demo-2.0",
+      "trials": 40,
+      "successes": 39,
+      "source": "SYNTHETIC-LAB-3",
+      "revision": "r1"
+    },
+    {
+      "configuration": "Hardware B",
+      "scenario": "Attention lapse",
+      "version": "demo-2.0",
+      "trials": 40,
+      "successes": 39,
+      "source": "SYNTHETIC-LAB-4",
+      "revision": "r1"
+    },
+    {
+      "configuration": "Hardware B",
+      "scenario": "Mode transition",
+      "version": "demo-2.0",
+      "trials": 40,
+      "successes": 39,
+      "source": "SYNTHETIC-LAB-5",
+      "revision": "r1"
+    },
+    {
+      "configuration": "Hardware B",
+      "scenario": "Operating boundary",
+      "version": "demo-2.0",
+      "trials": 40,
+      "successes": 39,
+      "source": "SYNTHETIC-LAB-6",
+      "revision": "r1"
+    }
+  ]
+}
