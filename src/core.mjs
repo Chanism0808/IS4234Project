@@ -1,5 +1,5 @@
 // Pure, dependency-free demonstration policy. These are NOT automotive safety criteria.
-export const RULES = Object.freeze({version:'classroom-3', minTrials:30, minSuccess:0.95, minMiles:1000});
+export const RULES = Object.freeze({version:'classroom-4', minTrials:30, minSuccess:0.95, minMiles:1000});
 export const BASELINE = Object.freeze({
   scenarios:Object.freeze(['Attention lapse','Mode transition','Operating boundary']),
   configurations:Object.freeze(['Hardware A','Hardware B'])
@@ -85,7 +85,7 @@ export function fieldGate(f, version) {
 function record(s, actor, type, details, now) {s.history.push({id:s.history.length+1,at:now,actor,type,details:clone(details)});}
 export function createState(candidate, now=new Date().toISOString()) {
   validateCandidate(candidate);
-  const s={schemaVersion:3,candidate:clone(candidate),revision:1,stage:'draft',field:null,evaluations:[],actions:[],decisions:[],history:[]};
+  const s={schemaVersion:4,candidate:clone(candidate),revision:1,stage:'draft',field:null,fieldContributors:{},evaluations:[],actions:[],decisions:[],history:[]};
   record(s,candidate.submitter,'Candidate loaded',{candidate,baseline:BASELINE,ruleVersion:RULES.version},now);
   return s;
 }
@@ -100,7 +100,7 @@ function conclusion(command) {
 }
 function currentEvaluation(s,reference) {return s.evaluations.find(e=>e.version===s.candidate.version && (!reference || e.reference===reference));}
 function fieldAuthors(f) {return f?.authors??(f?.submittedBy?[f.submittedBy]:[]);}
-function fieldFingerprint(f) {return JSON.stringify({version:f.version,source:f.source,revision:f.revision,eventDefinition:f.eventDefinition,observationPeriod:f.observationPeriod,evaluationReference:f.evaluationReference,baseline:f.baseline,post:f.post,comparable:f.comparable,complete:f.complete,safeguardsEnabled:f.safeguardsEnabled,seriousEvent:f.seriousEvent});}
+function versionFieldAuthors(s,version) {return s.fieldContributors?.[version]??[];}
 
 export function transition(state, command, now=new Date().toISOString()) {
   requireThat(Number.isFinite(Date.parse(now)),'Invalid decision time.');
@@ -116,7 +116,7 @@ export function transition(state, command, now=new Date().toISOString()) {
     case 'approveLimited':
     case 'approveExpansion': {
       const review=conclusion(command);
-      independent(s,p,command.type==='approveExpansion'?fieldAuthors(s.field):[]);
+      independent(s,p,command.type==='approveExpansion'?versionFieldAuthors(s,s.candidate.version):[]);
       requireThat(laboratoryGate(s.candidate).status==='pass','Required laboratory evidence is missing, failed or insufficient.');
       let evaluation=null;
       if(command.type==='approveLimited') {
@@ -139,8 +139,9 @@ export function transition(state, command, now=new Date().toISOString()) {
       validateField(command.field);
       requireThat(command.field.version===s.candidate.version,'Field evidence must match the current version.');
       requireThat(currentEvaluation(s,command.field.evaluationReference),'Field evidence requires a matching controlled-evaluation reference for this software version.');
-      const priorAuthors=s.field && fieldFingerprint(s.field)===fieldFingerprint(command.field)?fieldAuthors(s.field):[];
-      const submittedField={...clone(command.field),submittedBy:p.id,authors:[...new Set([...priorAuthors,p.id])]};
+      const authors=[...new Set([...versionFieldAuthors(s,command.field.version),p.id])];
+      s.fieldContributors[command.field.version]=authors;
+      const submittedField={...clone(command.field),submittedBy:p.id,authors:clone(authors)};
       const gate=fieldGate(submittedField,s.candidate.version);
       if(gate.status!=='pass') {
         requireThat(PEOPLE.some(x=>x.id===command.owner),'Assign a corrective-action owner.');
@@ -165,7 +166,7 @@ export function transition(state, command, now=new Date().toISOString()) {
       const a=s.actions.find(a=>a.id===command.id);
       requireThat(a?.status==='open','Action is not open.');
       requireThat(a.resolution,'Submit the action resolution before independent verification.');
-      independent(s,p,[...fieldAuthors(a.trigger?.field),...fieldAuthors(s.field),a.resolution.submittedBy]);rationale(command.rationale);
+      independent(s,p,[...versionFieldAuthors(s,a.version),...versionFieldAuthors(s,s.candidate.version),...fieldAuthors(a.trigger?.field),...fieldAuthors(s.field),a.resolution.submittedBy]);rationale(command.rationale);
       requireThat(a.owner!==p.id,'Action owners cannot independently close their own actions.');
       requireThat(laboratoryGate(s.candidate).status==='pass' && fieldGate(s.field,s.candidate.version).status==='pass','Current version laboratory and field checks must pass before closure.');
       a.status='closed';a.closedAt=now;a.closedBy=p.id;a.rationale=command.rationale;a.resolution.verifiedBy=p.id;a.resolution.verifiedAt=now;

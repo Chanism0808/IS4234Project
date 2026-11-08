@@ -10,9 +10,9 @@ The required scope is defined in code as exactly three scenarios across two hard
 
 Each scenario defines its hazard, safeguard, intended behavioural outcome and success criterion. Laboratory evidence records the scenario, configuration, software version, source revision, trials and successes.
 
-Field evidence records the evaluated version, controlled-evaluation reference, contributing identities, event definition, observation period, source revision, cohort exposure and screening declarations. Identical resubmission retains earlier contributors. A passing calculation is labelled only as eligible for independent review.
+Field evidence records the evaluated version, controlled-evaluation reference, contributing identities, event definition, observation period, source revision, cohort exposure and screening declarations. Every submitter is added to a conservative contributor list for that software version. The list survives all field revisions and candidate revisions that retain the version; a new version starts a separate list. A passing calculation is labelled only as eligible for independent review.
 
-Corrective actions preserve the original reason and field snapshot. The action owner first submits an investigation finding, action taken or justified disposition and resolution evidence reference. A different identity then verifies the saved record. Editing requires a new submission before verification.
+Corrective actions preserve the original reason and field snapshot. The action owner first submits an investigation finding, action taken or justified disposition and resolution evidence reference. A different identity then verifies the saved record. The owner can reopen the populated form and submit a corrected record; each submission is recorded and the latest record requires verification.
 
 Decisions preserve the applicable scope, definitions, evidence, evaluation reference, reviewer conclusion, remaining uncertainty and rationale. Full snapshots favour transparent classroom review over storage efficiency.
 

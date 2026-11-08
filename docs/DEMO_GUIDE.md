@@ -28,6 +28,8 @@ Open **Corrective actions**. Switch to Alex, enter the investigation finding, ac
 
 Switch to Priya, enter the independent verification rationale, then verify and close the action. Priya cannot change the saved author or resolution fields during verification.
 
+If the saved record needs correction, switch to Alex and click **Edit resolution**. Saving the revision records another submission and still requires Priya's verification.
+
 ## 5 Make and inspect the decision
 
 Return to **Evidence & release**. Complete the three decision fields and approve expansion.
@@ -39,6 +41,7 @@ Open **Decision history** and export the JSON. It includes the fixed scope, defi
 - Cannot approve: check the selected identity, all three decision fields, evidence status and open actions.
 - Cannot record field evidence: first approve controlled evaluation and use its exact reference.
 - Cannot submit a resolution: switch to the action owner.
+- Cannot edit a resolution: the action must still be open; click **Edit resolution**, then switch to its owner before saving.
 - Cannot close an action: record improving evidence, submit the resolution first, then use a verifier independent of the owner and all supporting evidence authors.
 - Old local case: click **Reset demonstration** after an update.
 

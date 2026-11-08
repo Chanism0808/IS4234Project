@@ -25,9 +25,9 @@ npm test
 | Report control | Implementation |
 | --- | --- |
 | C2 Evidence coverage | Candidate scope must exactly match the fixed three-scenario by two-configuration baseline. Each scenario defines its hazard, safeguard, intended outcome and success criterion. |
-| C3 Independent decision | Candidate and retained field-evidence contributors cannot approve their own work. Decisions require an outcome conclusion, remaining uncertainty and rationale. |
+| C3 Independent decision | Candidate and version-level field-evidence contributors cannot approve their own work. Contributor history survives all revisions of the same software version. Decisions require an outcome conclusion, remaining uncertainty and rationale. |
 | C4 Reassessment after change | Candidate revisions invalidate approval. Controlled-evaluation and field records remain version-specific, while historical snapshots are retained. |
-| C5 Adverse-signal escalation | Failed or inconclusive screening creates an owned action with its trigger snapshot. The owner submits action-specific resolution evidence before a separate identity verifies closure. |
+| C5 Adverse-signal escalation | Failed or inconclusive screening creates an owned action with its trigger snapshot. The owner submits or edits action-specific resolution evidence before a separate identity verifies closure. |
 
 C1 safety-change legal assessment and C6 recall campaign reconciliation are outside this prototype. Evidence and decision exports support review; they do not establish legal compliance.
 
@@ -43,7 +43,7 @@ The default example deliberately has missing evidence. Start with the [five-minu
 
 ## Demonstration rules
 
-Rule version `classroom-3` requires 30 trials and at least 95% successful responses for each fixed-baseline scenario/configuration. Field screening requires at least 1,000 engaged miles per cohort, declared completeness and comparability, enabled safeguards, no serious-event flag and no increase in the selected event rate. Passing means eligible for independent review, not proven safe or effective.
+Rule version `classroom-4` requires 30 trials and at least 95% successful responses for each fixed-baseline scenario/configuration. Field screening requires at least 1,000 engaged miles per cohort, declared completeness and comparability, enabled safeguards, no serious-event flag and no increase in the selected event rate. Passing means eligible for independent review, not proven safe or effective.
 
 These values are illustrative teaching rules. They are not validated automotive safety criteria or Tesla thresholds. A 95% response rate may be wholly inappropriate for critical hazards. Simple rates do not establish statistical significance or acceptable rare-event risk.
 
