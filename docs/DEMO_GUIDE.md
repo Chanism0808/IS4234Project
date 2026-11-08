@@ -1,61 +1,40 @@
 # Five-minute demonstration guide
 
-## Purpose
+All records and decisions are synthetic. The app demonstrates governance controls, not vehicle safety.
 
-Show how evidence changes decisions. All people, tests, configurations and field data are synthetic. The app does not measure real vehicle safety.
+## 1 Start with a blocked case
 
-## 1. Show the missing evidence
+Run `npm start`, open http://localhost:3000 and select **Evidence & release**.
 
-Run `npm start` and open http://localhost:3000. A new browser starts with the missing-evidence case. Select **Evidence & release**. One configuration/scenario lacks current-version evidence, so review is inconclusive and limited deployment cannot be approved.
+The default case has five of six required combinations. Try removing a scenario from the JSON and applying it. The fixed baseline rejects the reduction.
 
-Explain: C2 makes incomplete evidence consequential.
+## 2 Approve controlled evaluation
 
-## 2. Repair the evidence and challenge self-approval
+Click **Fill passing results**, then **Apply evidence revision**.
 
-As Alex Chen (Engineer), click **Fill with passing synthetic results**, then **Apply evidence revision**. This generates sample records; it is not a substitute for real tests. Enter a decision rationale and try **Approve limited deployment** while still the engineer. The app rejects self-approval.
+Switch to Priya Shah. Complete the three decision fields, keep the controlled-evaluation reference, and click **Approve controlled evaluation**.
 
-Switch to Priya Shah (Reviewer), retain or enter a rationale, then approve limited deployment. This authorises a simulated stage only.
+## 3 Record a concern
 
-Explain: C3 separates the submitter from the reviewer and requires a reason for the decision.
+Open **Field monitoring** and switch to Sam Rivera. Keep the prefilled event definition, observation period and evaluation reference. Select Alex as owner, then record the prefilled adverse assessment.
 
-## 3. Introduce an adverse field signal
+The screening fails, review reopens and an action is created. Sam is recorded as the field-evidence author, so Sam cannot approve expansion from it.
 
-Select **Field monitoring** and switch back to Alex. The initial form contains 8 baseline events over 4,000 engaged miles and 12 post-update events over 4,000 miles. Their rates are 2.0 and 3.0 per 1,000 engaged miles.
+## 4 Resolve the action
 
-Keep the evidence quality declarations checked. Choose Alex as owner and a due date before today's UTC date to demonstrate escalation. Click **Record field assessment**. The result fails the illustrative rule, reopens review and creates an action.
+Click **Fill improving example** and record it. The action stays open.
 
-Go to **Corrective actions**, then **Check overdue actions**. The action is escalated to the safety lead in the local history. No message is sent to a real person.
+Open **Corrective actions**. Switch to Priya and enter an investigation finding, action or disposition, resolution evidence reference and verification rationale. Keep Alex as the resolution-evidence author, then verify and close the action.
 
-Explain: C5 links a signal to ownership, a deadline and follow-up. If comparability were unchecked instead, the rate comparison would be inconclusive rather than proof of deterioration.
+## 5 Make and inspect the decision
 
-## 4. Resolve without automatic closure
+Return to **Evidence & release**. Complete the three decision fields and approve expansion.
 
-Return to **Field monitoring**. Click **Fill improving example** and then **Record field assessment**. The synthetic post-update rate becomes 1.0 per 1,000 miles, but the action stays open.
-
-Select **Corrective actions**, switch to Priya and enter a closure rationale describing the revised evidence. Click **Close action independently**. An action owner cannot close their own action; use the safety lead if Priya was assigned as owner.
-
-Return to **Evidence & release**, enter a separate decision rationale and select **Approve expansion**. Closure did not automatically grant release permission.
-
-## 5. Reconstruct and challenge the decision
-
-Open **Decision history**, expand an event and export the review JSON. It contains input snapshots, the rule version, reviewers, rationales and action history.
-
-To demonstrate C4, switch to the engineer, change the candidate version in its JSON editor and apply the revision. The approval is invalidated and old-version tests no longer satisfy the gate. Historical decisions remain inspectable.
-
-## Other cases
-
-The overview offers complete, failed and wrong-version examples. Loading a sample replaces the local case after confirmation. Export first. Import in the evidence editor accepts the candidate schema shown in `data/complete.json`, up to 1 MB; applying it must retain the current candidate ID and submitter.
+Open **Decision history** and export the JSON. It includes the fixed scope, definitions, versions, evidence authors, reviewer conclusions, evaluation reference and action resolution.
 
 ## Troubleshooting
 
-- Blank interface when opening a file: run the HTTP server and use localhost; do not use a `file://` URL.
-- Port busy: stop the other process or set the `PORT` environment variable before starting the server.
-- Cannot approve: inspect evidence, current stage, open actions, selected identity and rationale.
-- Cannot close: both current gates must pass, and the closer must differ from the submitter and action owner.
-- Cannot submit field results: first authorise limited deployment and switch to the engineer or safety lead.
-- Local storage unavailable: export the current review before leaving the page.
-- Corrupted local storage: clear site data for localhost and reload. This discards the local case.
-
-## Claims appropriate for the presentation
-
-The prototype demonstrates enforcement of configured workflow rules in a local browser. Automated policy tests cover important state transitions. It has not been evaluated with real Tesla data, a participant study or real-vehicle safety outcomes. Refer to `VALIDATION.md` for exactly what was tested.
+- Cannot approve: check the selected identity, all three decision fields, evidence status and open actions.
+- Cannot record field evidence: first approve controlled evaluation and use its exact reference.
+- Cannot close an action: record improving evidence, complete every resolution field and use a verifier independent of the owner and evidence author.
+- Old local case: click **Reset demonstration** after an update.

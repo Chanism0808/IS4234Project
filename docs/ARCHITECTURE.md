@@ -2,34 +2,36 @@
 
 ## Design
 
-The app separates a dependency-free policy module from browser rendering. `transition` clones its input, validates an action and returns a new state; rejected commands leave the prior state unchanged. Inputs are rendered with HTML escaping, and JSON imports are size-limited and validated before use.
+The browser interface calls a dependency-free policy module. `transition` clones its input, validates a command and returns a new state, so rejected commands do not mutate the prior state. JSON imports are size-limited, validated and HTML-escaped when displayed.
 
 ## Data model
 
-A candidate identifies its ID, title, version, submitter, required configurations and scenarios. Each laboratory record identifies a scenario, configuration, software version, source, source revision, trial count and success count. Duplicate records for the same scenario/configuration/version are rejected.
+The required baseline is defined in code as three scenarios across two hardware configurations. Candidate JSON may add scope but cannot remove these six required combinations.
 
-Field evidence identifies its software version, source and revision, baseline/post-update event counts and engaged miles, and boolean quality/safeguard/serious-event declarations. These declarations are assumptions requiring qualified review in any real deployment.
+Each scenario defines its hazard, safeguard, intended behavioural outcome and success criterion. Laboratory evidence records the scenario, configuration, software version, source revision, trials and successes.
 
-State holds the candidate, evidence revision, release stage, current field evidence, corrective actions, decisions and history. Decisions capture the candidate and field evidence at approval time. Full snapshots trade storage efficiency for transparent classroom review.
+Field evidence records the evaluated version, controlled-evaluation reference, submitting identity, event definition, observation period, source revision, cohort exposure and screening declarations. A passing calculation is labelled only as eligible for independent review.
+
+Corrective actions preserve the original reason and field snapshot. Closure requires an investigation finding, action taken or justified disposition, a resolution evidence reference, its submitting identity and an independent verification rationale.
+
+Decisions preserve the applicable scope, definitions, evidence, evaluation reference, reviewer conclusion, remaining uncertainty and rationale. Full snapshots favour transparent classroom review over storage efficiency.
 
 ## Release transitions
 
 | Starting state | Action | Preconditions | Result |
 | --- | --- | --- | --- |
-| Draft | Approve limited deployment | Laboratory gate passes; independent reviewer; rationale; no open actions | Limited |
-| Limited, review or expanded | Record material field evidence | Prior limited deployment; engineer or safety lead; valid evidence | Review required |
-| Review or limited | Approve expansion | Both gates pass; independent reviewer; rationale; no open actions | Expanded |
-| Any | Revise candidate | Engineer; valid candidate with same ID and submitter | Draft; current field evidence cleared |
-| Any deployed case | Close action | Both gates pass; independent closer differs from owner and submitter; rationale | Action closed; release stage unchanged |
+| Draft | Approve controlled evaluation | Laboratory gate passes; independent reviewer; structured conclusion; version-specific evaluation reference; no open action for this version | Controlled evaluation |
+| Controlled or review | Record field evidence | Matching version and evaluation reference; engineer or safety lead | Review required; failed or inconclusive screening creates an action |
+| Any | Revise candidate | Engineer; fixed baseline retained; definitions complete; same case identity | Draft; current field evidence cleared; older version records retained |
+| Any evaluated case | Close action | Current gates pass; action-specific resolution supplied; verifier differs from submitter, owner and resolution author | Action closed; stage unchanged |
+| Controlled or review | Approve expansion | Current gates pass; all actions closed; reviewer differs from candidate and field authors; structured conclusion | Expanded |
 
-A revised candidate retains historical actions and decisions. Field evidence can be gathered after an earlier limited deployment even while a revision is draft, but the draft still requires a new limited-deployment decision before expansion. This accommodates remediation of an already deployed candidate without discarding its concerns.
+An older-version action does not block controlled evaluation of a corrective build. The new build needs its own reference and evidence. The older action remains open and still blocks expansion until its resolution is independently verified.
 
 ## GRC contribution
 
-C2 makes unsupported evidence block review eligibility. C3 requires an attributable decision and rationale. C4 prevents silent reuse of approvals after material changes. C5 prevents a better metric from silently closing a concern. C1 legal classification and C6 recall reconciliation remain outside the implementation.
+C2 protects required scope and makes incomplete evidence consequential. C3 records attributable, independent conclusions. C4 invalidates approvals after material change and keeps version-specific provenance. C5 preserves concerns until action-specific resolution is independently verified. C1 legal classification and C6 recall reconciliation remain outside the implementation.
 
 ## Production gaps
 
-Local state and identity selection are deliberately simulated. There is no true access control, protected audit trail, backend, collaboration, vehicle integration or deployment enforcement. Due-date escalation operates only while the application is running and does not send external messages. Source quality, cohort completeness and comparability are not independently verified. A production implementation needs domain-valid criteria and statistical methods, not these example thresholds.
-
-The workflow cannot prevent a reviewer from making a poor judgment or an engineer from submitting misleading evidence. Independent validation, organisational authority and trustworthy source systems remain necessary.
+Identity selection, local storage, synthetic evidence and release stages are simulations. There is no authentication, protected audit trail, backend, vehicle integration or deployment enforcement. Illustrative thresholds are screening rules, not validated safety criteria. Production use would require trustworthy source systems, domain-valid methods, authorised reviewers, privacy controls and server-side records.

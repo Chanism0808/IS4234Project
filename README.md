@@ -24,26 +24,26 @@ npm test
 
 | Report control | Implementation |
 | --- | --- |
-| C2 Evidence coverage | Checks every required scenario × hardware configuration for current-version evidence, trial count and response rate. Missing, insufficient and failed evidence are distinguished. |
-| C3 Independent decision | Demonstration identities separate submission and approval. A rationale is mandatory. |
-| C4 Reassessment after change | Candidate revisions invalidate approval and clear current field evidence. Material field revisions reopen review. Historical decisions retain their evidence snapshots. |
-| C5 Adverse-signal escalation | Failed or inconclusive field assessments create owned, dated actions. Overdue actions escalate. Improved data does not automatically close an action. Closure and expansion are separate decisions. |
+| C2 Evidence coverage | A fixed three-scenario by two-configuration baseline cannot be reduced. Each scenario defines its hazard, safeguard, intended outcome and success criterion. |
+| C3 Independent decision | Candidate and field-evidence authors cannot approve their own work. Decisions require an outcome conclusion, remaining uncertainty and rationale. |
+| C4 Reassessment after change | Candidate revisions invalidate approval. Controlled-evaluation and field records remain version-specific, while historical snapshots are retained. |
+| C5 Adverse-signal escalation | Failed or inconclusive screening creates an owned action with its trigger snapshot. Closure requires action-specific resolution evidence and independent verification. |
 
 C1 safety-change legal assessment and C6 recall campaign reconciliation are outside this prototype. Evidence and decision exports support review; they do not establish legal compliance.
 
 ## Interface
 
 - **Overview:** release stage, evidence coverage, field assessment, open actions and synthetic sample selection.
-- **Evidence & release:** evidence matrix, JSON editor/import, synthetic repair helper and independent decisions.
-- **Field monitoring:** baseline/post-update exposure, event rates, evidence quality, safeguard activation and serious-event concerns.
-- **Corrective actions:** ownership, UTC due dates, escalation and independent closure.
+- **Evidence & release:** fixed-baseline matrix, evidence definitions, JSON editor/import and structured independent decisions.
+- **Field monitoring:** event definition, observation period, version-specific evaluation reference, exposure and screening.
+- **Corrective actions:** trigger snapshots, ownership, due dates, resolution evidence and independent verification.
 - **Decision history:** recorded actions and inspectable input snapshots; export as JSON.
 
 The default example deliberately has missing evidence. Start with the [five-minute walkthrough](docs/DEMO_GUIDE.md).
 
 ## Demonstration rules
 
-Rule version `classroom-1` requires 30 trials and at least 95% successful responses for each required scenario/configuration. Field review requires at least 1,000 engaged miles per cohort, declared completeness and comparability, enabled safeguards, no serious-event flag and no increase in the selected event rate.
+Rule version `classroom-2` requires 30 trials and at least 95% successful responses for each fixed-baseline scenario/configuration. Field screening requires at least 1,000 engaged miles per cohort, declared completeness and comparability, enabled safeguards, no serious-event flag and no increase in the selected event rate. Passing means eligible for independent review, not proven safe or effective.
 
 These values are illustrative teaching rules. They are not validated automotive safety criteria or Tesla thresholds. A 95% response rate may be wholly inappropriate for critical hazards. Simple rates do not establish statistical significance or acceptable rare-event risk.
 
