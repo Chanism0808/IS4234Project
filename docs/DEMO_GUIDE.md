@@ -6,7 +6,7 @@ All records and decisions are synthetic. The app demonstrates governance control
 
 Run `npm start`, open http://localhost:3000 and select **Evidence & release**.
 
-The default case has five of six required combinations. Try removing a scenario from the JSON and applying it. The fixed baseline rejects the reduction.
+The default case has five of six required combinations. Try adding or removing a scenario or configuration in the JSON. The fixed scope rejects either change.
 
 ## 2 Approve controlled evaluation
 
@@ -24,7 +24,9 @@ The screening fails, review reopens and an action is created. Sam is recorded as
 
 Click **Fill improving example** and record it. The action stays open.
 
-Open **Corrective actions**. Switch to Priya and enter an investigation finding, action or disposition, resolution evidence reference and verification rationale. Keep Alex as the resolution-evidence author, then verify and close the action.
+Open **Corrective actions**. Switch to Alex, enter the investigation finding, action or disposition and resolution evidence reference, then submit the resolution. Alex is recorded automatically as its author.
+
+Switch to Priya, enter the independent verification rationale, then verify and close the action. Priya cannot change the saved author or resolution fields during verification.
 
 ## 5 Make and inspect the decision
 
@@ -36,5 +38,8 @@ Open **Decision history** and export the JSON. It includes the fixed scope, defi
 
 - Cannot approve: check the selected identity, all three decision fields, evidence status and open actions.
 - Cannot record field evidence: first approve controlled evaluation and use its exact reference.
-- Cannot close an action: record improving evidence, complete every resolution field and use a verifier independent of the owner and evidence author.
+- Cannot submit a resolution: switch to the action owner.
+- Cannot close an action: record improving evidence, submit the resolution first, then use a verifier independent of the owner and all supporting evidence authors.
 - Old local case: click **Reset demonstration** after an update.
+
+The prototype has one active candidate version. Earlier-version evidence remains in history, but new monitoring can only be recorded for the active version.

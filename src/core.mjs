@@ -1,5 +1,5 @@
 // Pure, dependency-free demonstration policy. These are NOT automotive safety criteria.
-export const RULES = Object.freeze({version:'classroom-2', minTrials:30, minSuccess:0.95, minMiles:1000});
+export const RULES = Object.freeze({version:'classroom-3', minTrials:30, minSuccess:0.95, minMiles:1000});
 export const BASELINE = Object.freeze({
   scenarios:Object.freeze(['Attention lapse','Mode transition','Operating boundary']),
   configurations:Object.freeze(['Hardware A','Hardware B'])
@@ -22,7 +22,7 @@ export function validateCandidate(c) {
   for (const key of ['configurations','scenarios']) {
     requireThat(Array.isArray(c[key]) && c[key].length>0 && c[key].length<=30 && c[key].every(str), `${key} must contain 1-30 named entries.`);
     requireThat(new Set(c[key]).size===c[key].length, `${key} contains duplicates.`);
-    requireThat(BASELINE[key].every(required=>c[key].includes(required)), `Required baseline ${key} cannot be removed.`);
+    requireThat(c[key].length===BASELINE[key].length && BASELINE[key].every(required=>c[key].includes(required)), `Candidate ${key} must exactly match the fixed baseline.`);
   }
   requireThat(c.scenarioDefinitions && typeof c.scenarioDefinitions==='object', 'Scenario definitions are required.');
   for(const scenario of c.scenarios) for(const field of definitionFields) requireThat(str(c.scenarioDefinitions[scenario]?.[field]), `${scenario}: ${field} is required.`);
@@ -56,6 +56,7 @@ export function validateField(f) {
   requireThat(f && typeof f==='object','Field evidence must be an object.');
   for(const k of ['version','source','revision','eventDefinition','observationPeriod','evaluationReference']) requireThat(str(f[k]),`Field ${k} is required.`);
   if(f.submittedBy!==undefined) requireThat(PEOPLE.some(p=>p.id===f.submittedBy),'Field evidence submitter is unknown.');
+  if(f.authors!==undefined) requireThat(Array.isArray(f.authors) && f.authors.length>0 && new Set(f.authors).size===f.authors.length && f.authors.every(id=>PEOPLE.some(p=>p.id===id)),'Field evidence authors are invalid.');
   for(const k of ['comparable','complete','safeguardsEnabled','seriousEvent']) requireThat(typeof f[k]==='boolean',`${k} must be true or false.`);
   for(const key of ['baseline','post']) requireThat(f[key] && count(f[key].events) && Number.isFinite(f[key].miles) && f[key].miles>=0, 'Events must be nonnegative integers and miles finite nonnegative numbers.');
   return f;
@@ -84,7 +85,7 @@ export function fieldGate(f, version) {
 function record(s, actor, type, details, now) {s.history.push({id:s.history.length+1,at:now,actor,type,details:clone(details)});}
 export function createState(candidate, now=new Date().toISOString()) {
   validateCandidate(candidate);
-  const s={schemaVersion:2,candidate:clone(candidate),revision:1,stage:'draft',field:null,evaluations:[],actions:[],decisions:[],history:[]};
+  const s={schemaVersion:3,candidate:clone(candidate),revision:1,stage:'draft',field:null,evaluations:[],actions:[],decisions:[],history:[]};
   record(s,candidate.submitter,'Candidate loaded',{candidate,baseline:BASELINE,ruleVersion:RULES.version},now);
   return s;
 }
@@ -98,6 +99,8 @@ function conclusion(command) {
   return {intendedOutcomeConclusion:command.intendedOutcomeConclusion,remainingUncertainty:command.remainingUncertainty,rationale:command.rationale};
 }
 function currentEvaluation(s,reference) {return s.evaluations.find(e=>e.version===s.candidate.version && (!reference || e.reference===reference));}
+function fieldAuthors(f) {return f?.authors??(f?.submittedBy?[f.submittedBy]:[]);}
+function fieldFingerprint(f) {return JSON.stringify({version:f.version,source:f.source,revision:f.revision,eventDefinition:f.eventDefinition,observationPeriod:f.observationPeriod,evaluationReference:f.evaluationReference,baseline:f.baseline,post:f.post,comparable:f.comparable,complete:f.complete,safeguardsEnabled:f.safeguardsEnabled,seriousEvent:f.seriousEvent});}
 
 export function transition(state, command, now=new Date().toISOString()) {
   requireThat(Number.isFinite(Date.parse(now)),'Invalid decision time.');
@@ -113,7 +116,7 @@ export function transition(state, command, now=new Date().toISOString()) {
     case 'approveLimited':
     case 'approveExpansion': {
       const review=conclusion(command);
-      independent(s,p,command.type==='approveExpansion'?[s.field?.submittedBy]:[]);
+      independent(s,p,command.type==='approveExpansion'?fieldAuthors(s.field):[]);
       requireThat(laboratoryGate(s.candidate).status==='pass','Required laboratory evidence is missing, failed or insufficient.');
       let evaluation=null;
       if(command.type==='approveLimited') {
@@ -136,7 +139,8 @@ export function transition(state, command, now=new Date().toISOString()) {
       validateField(command.field);
       requireThat(command.field.version===s.candidate.version,'Field evidence must match the current version.');
       requireThat(currentEvaluation(s,command.field.evaluationReference),'Field evidence requires a matching controlled-evaluation reference for this software version.');
-      const submittedField={...clone(command.field),submittedBy:p.id};
+      const priorAuthors=s.field && fieldFingerprint(s.field)===fieldFingerprint(command.field)?fieldAuthors(s.field):[];
+      const submittedField={...clone(command.field),submittedBy:p.id,authors:[...new Set([...priorAuthors,p.id])]};
       const gate=fieldGate(submittedField,s.candidate.version);
       if(gate.status!=='pass') {
         requireThat(PEOPLE.some(x=>x.id===command.owner),'Assign a corrective-action owner.');
@@ -147,16 +151,24 @@ export function transition(state, command, now=new Date().toISOString()) {
       if(s.stage!=='draft') s.stage='review';
       record(s,p.id,'Field evidence recorded; review required',{field:s.field,gate,revision:s.revision},now);break;
     }
-    case 'closeAction': {
+    case 'submitResolution': {
       const a=s.actions.find(a=>a.id===command.id);
       requireThat(a?.status==='open','Action is not open.');
       const resolution=command.resolution;
-      requireThat(resolution && PEOPLE.some(x=>x.id===resolution.submittedBy),'A resolution evidence submitter is required.');
+      requireThat(p.id===a.owner,'Only the action owner can submit or edit its resolution record.');
+      requireThat(resolution && typeof resolution==='object','A resolution record is required.');
       for(const key of ['investigationFinding','actionTakenOrDisposition','evidenceReference']) requireThat(str(resolution[key]),`Resolution ${key} is required.`);
-      independent(s,p,[resolution.submittedBy]);rationale(command.rationale);
+      a.resolution={investigationFinding:resolution.investigationFinding,actionTakenOrDisposition:resolution.actionTakenOrDisposition,evidenceReference:resolution.evidenceReference,submittedBy:p.id,submittedAt:now,resolvingVersion:s.candidate.version};
+      record(s,p.id,'Action resolution submitted; independent verification required',{actionId:a.id,resolution:a.resolution},now);break;
+    }
+    case 'closeAction': {
+      const a=s.actions.find(a=>a.id===command.id);
+      requireThat(a?.status==='open','Action is not open.');
+      requireThat(a.resolution,'Submit the action resolution before independent verification.');
+      independent(s,p,[...fieldAuthors(a.trigger?.field),...fieldAuthors(s.field),a.resolution.submittedBy]);rationale(command.rationale);
       requireThat(a.owner!==p.id,'Action owners cannot independently close their own actions.');
       requireThat(laboratoryGate(s.candidate).status==='pass' && fieldGate(s.field,s.candidate.version).status==='pass','Current version laboratory and field checks must pass before closure.');
-      a.status='closed';a.closedAt=now;a.closedBy=p.id;a.rationale=command.rationale;a.resolution={...clone(resolution),resolvingVersion:s.candidate.version,verifiedBy:p.id,verifiedAt:now};
+      a.status='closed';a.closedAt=now;a.closedBy=p.id;a.rationale=command.rationale;a.resolution.verifiedBy=p.id;a.resolution.verifiedAt=now;
       record(s,p.id,'Action independently closed',{action:a},now);break;
     }
     case 'escalate': {
