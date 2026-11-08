@@ -3,6 +3,26 @@
   "title": "Driver attention safeguard update",
   "version": "demo-2.0",
   "submitter": "engineer",
+  "scenarioDefinitions": {
+    "Attention lapse": {
+      "hazard": "Driver attention is not sustained while steering assistance is active.",
+      "safeguard": "Attention monitoring prompts escalation and disengagement.",
+      "intendedOutcome": "The driver responds to the attention prompt and resumes appropriate supervision.",
+      "successCriterion": "Under illustrative protocol SYNTH-LAB-ATTN-01, the driver acknowledges the prompt and resumes active supervision during the observation window."
+    },
+    "Mode transition": {
+      "hazard": "The driver does not recognise that steering assistance is ending.",
+      "safeguard": "The interface provides a clear transition alert.",
+      "intendedOutcome": "The driver recognises the transition and resumes appropriate control.",
+      "successCriterion": "Under illustrative protocol SYNTH-LAB-MODE-01, the driver acknowledges the transition alert and resumes steering control during the observation window."
+    },
+    "Operating boundary": {
+      "hazard": "Steering assistance remains in use outside its declared operating boundary.",
+      "safeguard": "Boundary detection warns the driver and restricts assistance.",
+      "intendedOutcome": "The driver exits or corrects the unsupported operating condition.",
+      "successCriterion": "Under illustrative protocol SYNTH-LAB-BOUNDARY-01, the driver exits the unsupported condition or assistance disengages during the observation window."
+    }
+  },
   "configurations": [
     "Hardware A",
     "Hardware B"
