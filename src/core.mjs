@@ -85,7 +85,7 @@ export function fieldGate(f, version) {
 function record(s, actor, type, details, now) {s.history.push({id:s.history.length+1,at:now,actor,type,details:clone(details)});}
 export function createState(candidate, now=new Date().toISOString()) {
   validateCandidate(candidate);
-  const s={schemaVersion:4,candidate:clone(candidate),revision:1,stage:'draft',field:null,fieldContributors:{},evaluations:[],actions:[],decisions:[],history:[]};
+  const s={schemaVersion:5,candidate:clone(candidate),candidateRevision:1,revision:1,stage:'draft',field:null,fieldContributors:{},evaluations:[],actions:[],decisions:[],history:[]};
   record(s,candidate.submitter,'Candidate loaded',{candidate,baseline:BASELINE,ruleVersion:RULES.version},now);
   return s;
 }
@@ -98,7 +98,7 @@ function conclusion(command) {
   requireThat(str(command.remainingUncertainty),'Remaining uncertainty is required.');
   return {intendedOutcomeConclusion:command.intendedOutcomeConclusion,remainingUncertainty:command.remainingUncertainty,rationale:command.rationale};
 }
-function currentEvaluation(s,reference) {return s.evaluations.find(e=>e.version===s.candidate.version && (!reference || e.reference===reference));}
+function currentEvaluation(s,reference) {return s.evaluations.find(e=>e.version===s.candidate.version && e.candidateRevision===s.candidateRevision && (!reference || e.reference===reference));}
 function fieldAuthors(f) {return f?.authors??(f?.submittedBy?[f.submittedBy]:[]);}
 function versionFieldAuthors(s,version) {return s.fieldContributors?.[version]??[];}
 
@@ -110,8 +110,8 @@ export function transition(state, command, now=new Date().toISOString()) {
       requireThat(p.role==='engineer','Only the engineer can revise candidate evidence.');
       validateCandidate(command.candidate);
       requireThat(command.candidate.id===s.candidate.id && command.candidate.submitter===s.candidate.submitter,'Revision must retain candidate ID and submitter. Load a new candidate to change them.');
-      s.candidate=clone(command.candidate);s.revision++;s.stage='draft';s.field=null;
-      record(s,p.id,'Evidence revised; approval invalidated',{candidate:s.candidate,revision:s.revision},now);break;
+      s.candidate=clone(command.candidate);s.candidateRevision++;s.revision++;s.stage='draft';s.field=null;
+      record(s,p.id,'Evidence revised; approval invalidated',{candidate:s.candidate,candidateRevision:s.candidateRevision,revision:s.revision},now);break;
     }
     case 'approveLimited':
     case 'approveExpansion': {
@@ -123,11 +123,11 @@ export function transition(state, command, now=new Date().toISOString()) {
         requireThat(!s.actions.some(a=>a.status==='open' && a.version===s.candidate.version),'Open corrective actions for this version must be independently closed first.');
         requireThat(s.stage==='draft','Limited deployment requires a draft candidate.');
         requireThat(str(command.evaluationReference),'A controlled-evaluation reference is required.');
-        evaluation={version:s.candidate.version,reference:command.evaluationReference,authorisedAt:now,authorisedBy:p.id};
+        evaluation={version:s.candidate.version,candidateRevision:s.candidateRevision,reference:command.evaluationReference,authorisedAt:now,authorisedBy:p.id};
         s.evaluations.push(evaluation);
       } else {
         requireThat(!s.actions.some(a=>a.status==='open'),'Open corrective actions must be independently closed before expansion.');
-        requireThat(['limited','review'].includes(s.stage) && currentEvaluation(s),'Expansion requires prior controlled evaluation for this software version.');
+        requireThat(['limited','review'].includes(s.stage) && currentEvaluation(s,s.field?.evaluationReference),'Expansion requires field evidence linked to the current candidate revision\'s controlled evaluation.');
         requireThat(fieldGate(s.field,s.candidate.version).status==='pass','Field evidence is failed or inconclusive.');
       }
       s.stage=command.type==='approveLimited'?'limited':'expanded';
@@ -138,7 +138,7 @@ export function transition(state, command, now=new Date().toISOString()) {
       requireThat(['engineer','safety'].includes(p.role),'Only an engineer or safety lead can submit field evidence.');
       validateField(command.field);
       requireThat(command.field.version===s.candidate.version,'Field evidence must match the current version.');
-      requireThat(currentEvaluation(s,command.field.evaluationReference),'Field evidence requires a matching controlled-evaluation reference for this software version.');
+      requireThat(currentEvaluation(s,command.field.evaluationReference),'Field evidence requires a matching controlled-evaluation reference for the current candidate revision.');
       const authors=[...new Set([...versionFieldAuthors(s,command.field.version),p.id])];
       s.fieldContributors[command.field.version]=authors;
       const submittedField={...clone(command.field),submittedBy:p.id,authors:clone(authors)};

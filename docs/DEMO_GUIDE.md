@@ -39,10 +39,10 @@ Open **Decision history** and export the JSON. It includes the fixed scope, defi
 ## Troubleshooting
 
 - Cannot approve: check the selected identity, all three decision fields, evidence status and open actions.
-- Cannot record field evidence: first approve controlled evaluation and use its exact reference.
+- Cannot record field evidence: approve controlled evaluation for the current candidate revision and use its exact reference. Revising evidence requires a fresh authorisation even when the software-version label is unchanged.
 - Cannot submit a resolution: switch to the action owner.
 - Cannot edit a resolution: the action must still be open; click **Edit resolution**, then switch to its owner before saving.
 - Cannot close an action: record improving evidence, submit the resolution first, then use a verifier independent of the owner and all supporting evidence authors.
 - Old local case: click **Reset demonstration** after an update.
 
-The prototype has one active candidate version. Earlier-version evidence remains in history, but new monitoring can only be recorded for the active version.
+The prototype has one active candidate revision. Earlier authorisations and evidence remain in history, but new monitoring can only use the controlled-evaluation authorisation for the active revision.
